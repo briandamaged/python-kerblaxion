@@ -1,6 +1,7 @@
 
 # Docker stuffs
 /docker-compose.yml
+/.env
 
 # Python stuffs
 *.pyc

@@ -1,3 +1,6 @@
 
+from .game import Game
+
 def main():
-  print("Hello!")
+  game = Game()
+  game.run()
