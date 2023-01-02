@@ -1,0 +1,19 @@
+version: "3.9"
+
+services:
+  game:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    
+    command: ./bin/spaxion
+
+    volumes:
+      - .:/usr/src/app
+      - /tmp/.X11-unix/:/tmp/.X11-unix/
+
+    devices:
+      - /dev/snd/
+
+    environment:
+      - DISPLAY

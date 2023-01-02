@@ -1,0 +1,9 @@
+
+# Docker stuffs
+/docker-compose.yml
+
+# Python stuffs
+*.pyc
+__pycache__
+
+

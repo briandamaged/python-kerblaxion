@@ -1,0 +1,30 @@
+FROM python:3.10
+
+
+RUN apt-get update && \
+    apt-get -y upgrade && \
+    apt-get -y install \
+      libsdl2-2.0-0 \
+      pulseaudio \
+      && \
+    groupadd --gid 1000 gamer && \
+    useradd --uid 1000 --gid gamer -G audio --shell /bin/bash --create-home gamer
+
+# Install Poetry for all users
+ENV POETRY_HOME=/opt/poetry
+ENV PATH="$POETRY_HOME/bin:$PATH"
+RUN curl -sSL https://install.python-poetry.org | python3 -
+
+# Install Dependencies globally
+WORKDIR /usr/src/app
+COPY \
+  pyproject.toml \
+  poetry.lock \
+  /usr/src/app/
+RUN \
+  poetry config virtualenvs.create false && \
+  poetry install
+
+USER gamer
+
+
