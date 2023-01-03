@@ -13,7 +13,7 @@ class Game(object):
       size = (1280, 720),
     )
 
-    pygame.display.set_caption("spaXion")
+    pygame.display.set_caption("kerblaxion")
 
     self.clock = pygame.time.Clock()
     self.fps = 30

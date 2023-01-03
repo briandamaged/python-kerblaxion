@@ -5,6 +5,6 @@ import sys
 
 sys.path.insert(0, os.path.abspath(os.path.join(__file__, "..", "..")))
 
-from arclia.spaxion.__main__ import main
+from arclia.kerblaxion.__main__ import main
 
 main()

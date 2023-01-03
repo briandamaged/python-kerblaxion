@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "spaxion"
+name = "kerblaxion"
 version = "0.1.0"
 description = "Space Invaders + Galaxian Clone"
 authors = ["Brian Lauber"]
