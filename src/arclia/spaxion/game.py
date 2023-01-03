@@ -4,7 +4,6 @@ import sys
 import pygame
 from pygame.locals import *
 
-
 class Game(object):
   def __init__(self):
     pygame.display.init()
