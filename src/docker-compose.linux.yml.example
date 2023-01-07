@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: Dockerfile
     
-    command: ./bin/spaxion
+    command: ./bin/kerblaxion
 
     volumes:
       - .:/usr/src/app

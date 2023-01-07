@@ -14,15 +14,15 @@ source .env
 
 docker buildx build \
   -f Dockerfile.dev \
-  -t "$SPAXION_IMAGE" \
+  -t "$KERBLAXION_IMAGE" \
   .
 
 docker run \
   -it \
   --rm \
-  --env DISPLAY="$SPAXION_DISPLAY" \
-  --device "$SPAXION_SOUND" \
+  --env DISPLAY="$KERBLAXION_DISPLAY" \
+  --device "$KERBLAXION_SOUND" \
   --mount "type=bind,source=$(pwd),target=/usr/src/app" \
-  --mount "type=bind,source=${SPAXION_X11},target=/tmp/.X11-unix/" \
+  --mount "type=bind,source=${KERBLAXION_X11},target=/tmp/.X11-unix/" \
   --user "$(id -u):$(id -g)" \
-  "$SPAXION_IMAGE" bash
+  "$KERBLAXION_IMAGE" bash

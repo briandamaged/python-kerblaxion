@@ -20,3 +20,9 @@ COPY \
 RUN \
   poetry config virtualenvs.create false && \
   poetry install
+
+RUN \
+  groupadd --gid 1000 gamer && \
+  useradd --uid 1000 --gid gamer -G audio --shell /bin/bash --create-home gamer
+
+USER gamer
