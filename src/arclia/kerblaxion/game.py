@@ -34,6 +34,8 @@ class Game(object):
 
 
   def run(self):
+    pygame.mixer.music.load("arclia/kerblaxion/assets/music/level01.mp3")
+    pygame.mixer.music.play()
     while True:
       for event in pygame.event.get():
         if event.type == QUIT:

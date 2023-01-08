@@ -17,11 +17,13 @@ class Bullet(pygame.sprite.Sprite):
       center = position,
     )
 
+    self.explode_sfx = pygame.mixer.Sound("arclia/kerblaxion/assets/sfx/hero-explode.wav")
+
   def update(self):
     self.rect.y -= 16
 
     if self.rect.bottom < 0:
-      print("BOOM!")
+      self.explode_sfx.play()
       self.kill()
 
 
