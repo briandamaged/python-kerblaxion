@@ -8,8 +8,10 @@ from arclia.pubsub import Publisher
 
 
 class Bullet(pygame.sprite.Sprite):
-  def __init__(self, position):
+  def __init__(self, position, game):
     super().__init__()
+    self.game = game
+
     self.image = pygame.surface.Surface(size = (16, 16))
     self.image.fill(color = (255, 255, 0))
 
@@ -22,13 +24,23 @@ class Bullet(pygame.sprite.Sprite):
   def update(self):
     self.rect.y -= 16
 
-    if self.rect.bottom < 0:
+    collisions = pygame.sprite.spritecollide(
+      sprite = self,
+      group = self.game.enemies,
+      dokill = True,
+    )
+
+    if len(collisions) > 0:
       self.explode_sfx.play()
+      self.kill()
+      return
+
+    if self.rect.bottom < 0:
       self.kill()
 
 
 class Hero(pygame.sprite.Sprite):
-  def __init__(self, game):
+  def __init__(self, position, game):
     super().__init__()
     self.game = game
 
@@ -36,7 +48,7 @@ class Hero(pygame.sprite.Sprite):
       self.image = pygame.image.load(fin)
 
     self.rect = self.image.get_rect(
-      center = (500, 500),
+      center = position,
     )
 
     self.shoot_sfx = pygame.mixer.Sound("arclia/kerblaxion/assets/sfx/shoot.wav")
@@ -58,7 +70,10 @@ class Hero(pygame.sprite.Sprite):
     if pressed[K_SPACE]:
       if not self.shooting:
         self.game.visible_sprites.add(
-          Bullet(position = self.rect.center)
+          Bullet(
+            position = self.rect.center,
+            game = self.game,
+          )
         )
         self.shoot_sfx.play()
         self.shooting = True
