@@ -12,7 +12,7 @@ class Bullet(pygame.sprite.Sprite):
     super().__init__()
     self.game = game
 
-    self.image = pygame.surface.Surface(size = (16, 16))
+    self.image = pygame.surface.Surface(size = (4, 4))
     self.image.fill(color = (255, 255, 0))
 
     self.rect = self.image.get_rect(
@@ -22,7 +22,7 @@ class Bullet(pygame.sprite.Sprite):
     self.explode_sfx = pygame.mixer.Sound("arclia/kerblaxion/assets/sfx/hero-explode.wav")
 
   def update(self):
-    self.rect.y -= 16
+    self.rect.y -= 4
 
     collisions = pygame.sprite.spritecollide(
       sprite = self,
@@ -44,8 +44,12 @@ class Hero(pygame.sprite.Sprite):
     super().__init__()
     self.game = game
 
-    with resources.open_binary("arclia.kerblaxion", "hero.png") as fin:
-      self.image = pygame.image.load(fin)
+    self.images = [
+      pygame.image.load(f"arclia/kerblaxion/assets/graphics/hero/hero0{i + 1}.png")
+      for i in range(4)
+    ]
+
+    self.image_index = 0
 
     self.rect = self.image.get_rect(
       center = position,
@@ -55,11 +59,19 @@ class Hero(pygame.sprite.Sprite):
 
     self.shooting = False
 
+  @property
+  def image(self):
+    return self.images[self.image_index]
+
   def update(self):
+    self.image_index += 1
+    if self.image_index >= 4:
+      self.image_index = 0
+
     pressed = pygame.key.get_pressed()
     boosted = pressed[K_LSHIFT]
 
-    v = 8 * (2 if boosted else 1)
+    v = 2 * (2 if boosted else 1)
 
     if pressed[K_LEFT]:
       self.rect.x -= v

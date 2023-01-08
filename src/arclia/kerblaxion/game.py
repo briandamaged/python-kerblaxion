@@ -14,17 +14,20 @@ class Enemy(pygame.sprite.Sprite):
   def __init__(self, position):
     super().__init__()
 
-    self.image = pygame.surface.Surface(
-      size = (64, 64),
-    )
-
-    self.image.fill(color = (255, 0, 0))
+    self.image = pygame.image.load("arclia/kerblaxion/assets/graphics/enemy01.png")
 
     self.rect = self.image.get_rect(
       center = position,
     )
 
+    self.direction = +1
 
+  def update(self):
+    self.rect.x += self.direction
+
+    if self.rect.right >= 320 or self.rect.left <= 0:
+      self.direction = -self.direction
+      self.rect.y += 8
 
 
 @dataclass(frozen = True)
@@ -42,6 +45,10 @@ class Game(object):
       size = (1280, 720),
     )
 
+    self.render_surface = pygame.surface.Surface(
+      size = (320, 180),
+    )
+
     pygame.display.set_caption("kerblaxion")
 
     self.clock = pygame.time.Clock()
@@ -52,12 +59,12 @@ class Game(object):
     self.enemies = pygame.sprite.Group()
 
     self.visible_sprites.add(Hero(
-      position = (1280 / 2, 640),
+      position = (180, 160),
       game = self,
     ))
 
-    for x in range(100, 1000, 96):
-      for y in range(100, 300, 96):
+    for x in range(16, 260, 24):
+      for y in range(16, 100, 24):
         e = Enemy(position = (x, y))
         self.visible_sprites.add(e)
         self.enemies.add(e)
@@ -75,8 +82,14 @@ class Game(object):
 
       self.visible_sprites.update()
 
-      self.display_surface.fill(color = (0, 0, 0))
-      self.visible_sprites.draw(self.display_surface)
+      self.render_surface.fill(color = (0, 0, 0))
+      self.visible_sprites.draw(self.render_surface)
+
+      pygame.transform.scale(
+        surface = self.render_surface,
+        size = (1280, 720),
+        dest_surface = self.display_surface,
+      )
 
       pygame.display.update()
 
