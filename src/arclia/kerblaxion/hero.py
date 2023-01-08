@@ -27,10 +27,12 @@ class Bullet(pygame.sprite.Sprite):
     collisions = pygame.sprite.spritecollide(
       sprite = self,
       group = self.game.enemies,
-      dokill = True,
+      dokill = False,
     )
 
     if len(collisions) > 0:
+      for c in collisions:
+        c.destroy()
       self.explode_sfx.play()
       self.kill()
       return

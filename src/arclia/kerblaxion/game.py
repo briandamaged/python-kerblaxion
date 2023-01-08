@@ -22,12 +22,29 @@ class Enemy(pygame.sprite.Sprite):
 
     self.direction = +1
 
-  def update(self):
-    self.rect.x += self.direction
+    self.exploding = False
+    self.explode_index = 0
 
-    if self.rect.right >= 320 or self.rect.left <= 0:
-      self.direction = -self.direction
-      self.rect.y += 8
+    self.explosions = [
+      pygame.image.load(f"arclia/kerblaxion/assets/graphics/explode0{i+1}.png")
+      for i in range(4)
+    ]
+
+  def destroy(self):
+    self.exploding = True
+
+  def update(self):
+    if self.exploding:
+      self.image = self.explosions[self.explode_index]
+      self.explode_index += 1
+      if self.explode_index >= 4:
+        self.kill()
+    else:
+      self.rect.x += self.direction
+
+      if self.rect.right >= 320 or self.rect.left <= 0:
+        self.direction = -self.direction
+        self.rect.y += 8
 
 
 @dataclass(frozen = True)
