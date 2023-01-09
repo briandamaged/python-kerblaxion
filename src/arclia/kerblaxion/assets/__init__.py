@@ -1,11 +1,16 @@
 
 from importlib import resources
 
-from arclia.happygame.assets import SurfaceLoader, CachingSurfaceLoader
-
-
-load_surface = SurfaceLoader(
-  resources.files(__name__).joinpath("graphics")
+from arclia.happygame.assets import (
+  CachingAssetLoader,
+  SoundLoader,
+  SurfaceLoader,
 )
 
-get_surface = CachingSurfaceLoader(load_surface)
+_assets = resources.files(__name__)
+
+load_surface = SurfaceLoader(_assets.joinpath("graphics"))
+get_surface = CachingAssetLoader(load_surface)
+
+load_sound = SoundLoader(_assets.joinpath("sfx"))
+get_sound = CachingAssetLoader(load_sound)

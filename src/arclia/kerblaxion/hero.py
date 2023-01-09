@@ -2,7 +2,7 @@
 import pygame
 from pygame.locals import *
 
-from .assets import get_surface
+from .assets import get_surface, get_sound
 
 class Bullet(pygame.sprite.Sprite):
   def __init__(self, position, game):
@@ -16,7 +16,7 @@ class Bullet(pygame.sprite.Sprite):
       center = position,
     )
 
-    self.explode_sfx = pygame.mixer.Sound("arclia/kerblaxion/assets/sfx/hero-explode.wav")
+    self.explode_sfx = get_sound("hero-explode.wav")
 
   def update(self):
     self.rect.y -= 4
@@ -54,7 +54,7 @@ class Hero(pygame.sprite.Sprite):
       center = position,
     )
 
-    self.shoot_sfx = pygame.mixer.Sound("arclia/kerblaxion/assets/sfx/shoot.wav")
+    self.shoot_sfx = get_sound("shoot.wav")
 
     self.shooting = False
 
