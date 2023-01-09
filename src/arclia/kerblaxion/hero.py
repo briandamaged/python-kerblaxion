@@ -1,11 +1,8 @@
 
-from importlib import resources
-
 import pygame
 from pygame.locals import *
 
-from arclia.pubsub import Publisher
-
+from .assets import get_surface
 
 class Bullet(pygame.sprite.Sprite):
   def __init__(self, position, game):
@@ -47,7 +44,7 @@ class Hero(pygame.sprite.Sprite):
     self.game = game
 
     self.images = [
-      pygame.image.load(f"arclia/kerblaxion/assets/graphics/hero/hero0{i + 1}.png")
+      get_surface(f"hero/hero0{i + 1}.png")
       for i in range(4)
     ]
 

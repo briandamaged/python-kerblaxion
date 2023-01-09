@@ -1,11 +1,13 @@
 
 import sys
+from importlib import resources
 
 from dataclasses import dataclass, field
 
 import pygame
 from pygame.locals import *
 
+from .assets import get_surface
 from .hero import Hero
 
 
@@ -14,7 +16,7 @@ class Enemy(pygame.sprite.Sprite):
   def __init__(self, position):
     super().__init__()
 
-    self.image = pygame.image.load("arclia/kerblaxion/assets/graphics/enemy01.png")
+    self.image = get_surface("enemy01.png")
 
     self.rect = self.image.get_rect(
       center = position,
@@ -26,7 +28,7 @@ class Enemy(pygame.sprite.Sprite):
     self.explode_index = 0
 
     self.explosions = [
-      pygame.image.load(f"arclia/kerblaxion/assets/graphics/explode0{i+1}.png")
+      get_surface(f"explode0{i+1}.png")
       for i in range(4)
     ]
 
@@ -56,7 +58,7 @@ class Game(object):
   def __init__(self):
     pygame.display.init()
     pygame.mixer.init()
-    # pygame.font.init()
+    pygame.font.init()
 
     self.display_surface = pygame.display.set_mode(
       size = (1280, 720),
