@@ -7,10 +7,14 @@ from arclia.happygame.assets import (
   SurfaceLoader,
 )
 
-_assets = resources.files(__name__)
+ASSETS_PATH = resources.files(__name__)
 
-load_surface = SurfaceLoader(_assets.joinpath("graphics"))
+GRAPHICS_PATH = ASSETS_PATH / "graphics"
+MUSIC_PATH = ASSETS_PATH / "music"
+SFX_PATH = ASSETS_PATH / "sfx"
+
+load_surface = SurfaceLoader(GRAPHICS_PATH)
 get_surface = CachingAssetLoader(load_surface)
 
-load_sound = SoundLoader(_assets.joinpath("sfx"))
+load_sound = SoundLoader(SFX_PATH)
 get_sound = CachingAssetLoader(load_sound)
