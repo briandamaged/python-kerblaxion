@@ -1,8 +1,7 @@
 
 import sys
-from importlib import resources
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 import pygame
 from pygame.locals import *
