@@ -9,6 +9,7 @@ from arclia.happygame.assets import (
 
 ASSETS_PATH = resources.files(__name__)
 
+FONTS_PATH = ASSETS_PATH / "fonts"
 GRAPHICS_PATH = ASSETS_PATH / "graphics"
 MUSIC_PATH = ASSETS_PATH / "music"
 SFX_PATH = ASSETS_PATH / "sfx"

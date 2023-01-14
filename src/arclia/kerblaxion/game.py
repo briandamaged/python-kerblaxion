@@ -6,14 +6,19 @@ from dataclasses import dataclass
 import pygame
 from pygame.locals import *
 
-from .assets import get_surface, MUSIC_PATH
+from arclia.happygame.math import Vector2Coercible
+
+from .assets import FONTS_PATH, get_surface, MUSIC_PATH
 from .hero import Hero
 
 
-
 class Enemy(pygame.sprite.Sprite):
-  def __init__(self, position):
+  def __init__(self,
+    position: Vector2Coercible,
+    game: "Game",
+  ):
     super().__init__()
+    self.game = game
 
     self.image = get_surface("enemy01.png")
 
@@ -33,6 +38,7 @@ class Enemy(pygame.sprite.Sprite):
 
   def destroy(self):
     self.exploding = True
+    self.game.score += 1
 
   def update(self):
     if self.exploding:
@@ -67,7 +73,7 @@ class Game(object):
       size = (320, 180),
     )
 
-    pygame.display.set_caption("kerblaxion")
+    pygame.display.set_caption("KERBLAXION")
 
     self.clock = pygame.time.Clock()
     self.fps = 30
@@ -83,9 +89,15 @@ class Game(object):
 
     for x in range(16, 260, 24):
       for y in range(16, 100, 24):
-        e = Enemy(position = (x, y))
+        e = Enemy(
+          position = (x, y),
+          game = self,
+        )
         self.visible_sprites.add(e)
         self.enemies.add(e)
+
+    self.score = 0
+    self.font = self.font = pygame.font.Font(FONTS_PATH / "Silkscreen-Regular.ttf", 8)
 
 
 
@@ -98,10 +110,30 @@ class Game(object):
           pygame.quit()
           sys.exit()
 
+      keys = pygame.key.get_pressed()
+      if keys[K_ESCAPE]:
+        pygame.quit()
+        sys.exit()
+
       self.visible_sprites.update()
 
       self.render_surface.fill(color = (0, 0, 0))
       self.visible_sprites.draw(self.render_surface)
+
+      score_surface = self.font.render(
+        f"{self.score:03d} POINTS",
+        False,
+        (255, 255, 255),
+      )
+
+      score_rect = score_surface.get_rect(
+        center = (160, 8),
+      )
+
+      self.render_surface.blit(
+        source = score_surface,
+        dest = score_rect,
+      )
 
       pygame.transform.scale(
         surface = self.render_surface,
