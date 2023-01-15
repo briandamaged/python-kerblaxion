@@ -5,12 +5,12 @@ from pygame.locals import *
 from arclia.happygame.math import Vector2Coercible
 
 from .assets import get_surface, get_sound
-from .game import Game
+from .game import GameManager
 
 class Enemy(pygame.sprite.Sprite):
   def __init__(self,
     position: Vector2Coercible,
-    game: "Game",
+    game: "GameManager",
   ):
     super().__init__()
     self.game = game
@@ -136,7 +136,7 @@ class Hero(pygame.sprite.Sprite):
       self.shooting = False
 
 
-def prepare(game: Game):
+def prepare(game: GameManager):
   game.visible_sprites.add(Hero(
     position = (180, 160),
     game = game,
@@ -154,6 +154,13 @@ def prepare(game: Game):
 
   def handle_quit(event: pygame.event.Event):
     if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
-      game.quit()
+      game.request_shutdown()
+
+  def handle_resize(event: pygame.event.Event):
+    if event.type == KEYDOWN and event.key == K_r:
+      game._display_surface = pygame.display.set_mode(
+        size = (640, 360),
+      )
 
   game.event_received.add(handle_quit)
+  game.event_received.add(handle_resize)
