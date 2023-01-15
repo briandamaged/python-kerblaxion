@@ -9,46 +9,69 @@ from .assets import get_surface, get_sound
 from .ui.score import Scoreboard
 from .game import GameManager, Scene, UpdateContext
 
-class Enemy(pygame.sprite.Sprite):
+class Explosion(pygame.sprite.Sprite):
   def __init__(self,
     position: Vector2Coercible,
   ):
     super().__init__()
+    self.position = pygame.Vector2(position)
 
-    self.image = get_surface("enemy01.png")
-
-    self.rect = self.image.get_rect(
-      center = position,
-    )
-
-    self.direction = +1
-
-    self.exploding = False
     self.explode_index = 0
-
     self.explosions = [
       get_surface(f"explode0{i+1}.png")
       for i in range(4)
     ]
 
+    self.started_at = pygame.time.get_ticks()
+
+  @property
+  def image(self):
+    return self.explosions[self.explode_index]
+
+  @property
+  def rect(self):
+    return self.image.get_rect(
+      center = self.position,
+    )
+
+  def update(self, ctx: UpdateContext):
+    # Update the explosion animation every 32 milliseconds
+    self.explode_index = (ctx.t - self.started_at) >> 5
+
+    if self.explode_index >= len(self.explosions):
+      self.kill()
+
+
+class Enemy(pygame.sprite.Sprite):
+  def __init__(self,
+    position: Vector2Coercible,
+  ):
+    super().__init__()
+    self.position = pygame.Vector2(position)
+
+    self.image = get_surface("enemy01.png")
+
+    self.direction = +1
+
     self.on_destroyed = Publisher[Enemy]()
 
+  @property
+  def rect(self):
+    return self.image.get_rect(
+      center = self.position,
+    )
+
   def destroy(self):
-    self.exploding = True
     self.on_destroyed(self)
+    self.kill()
 
-  def update(self):
-    if self.exploding:
-      self.image = self.explosions[self.explode_index]
-      self.explode_index += 1
-      if self.explode_index >= 4:
-        self.kill()
-    else:
-      self.rect.x += self.direction
+  def update(self, ctx: UpdateContext):
+    self.position.x += self.direction
 
-      if self.rect.right >= 320 or self.rect.left <= 0:
-        self.direction = -self.direction
-        self.rect.y += 8
+    r = self.rect
+    if r.right >= 320 or r.left <= 0:
+      self.direction = -self.direction
+      self.position.y += 8
 
 
 class Bullet(pygame.sprite.Sprite):
@@ -65,7 +88,7 @@ class Bullet(pygame.sprite.Sprite):
 
     self.explode_sfx = get_sound("hero-explode.wav")
 
-  def update(self):
+  def update(self, ctx: UpdateContext):
     self.rect.y -= 4
 
     collisions = pygame.sprite.spritecollide(
@@ -109,10 +132,8 @@ class Hero(pygame.sprite.Sprite):
   def image(self):
     return self.images[self.image_index]
 
-  def update(self):
-    self.image_index += 1
-    if self.image_index >= 4:
-      self.image_index = 0
+  def update(self, ctx: UpdateContext):
+    self.image_index = (ctx.t >> 5) % 4
 
     pressed = pygame.key.get_pressed()
     boosted = pressed[K_LSHIFT]
@@ -148,7 +169,7 @@ class GameScene(Scene):
     self.scoreboard = Scoreboard()
 
   def update(self, ctx: UpdateContext):
-    self.visible_sprites.update()
+    self.visible_sprites.update(ctx)
 
   def draw(self, surface: pygame.surface.Surface):
     surface.fill(color = (0, 0, 0))
@@ -167,6 +188,8 @@ def prepare():
 
   def handle_enemy_destroyed(enemy: Enemy):
     scene.scoreboard.score += 250
+    explosion = Explosion(position = enemy.position)
+    scene.visible_sprites.add(explosion)
 
   scene.visible_sprites.add(Hero(
     position = (180, 160),
