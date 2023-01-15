@@ -34,6 +34,9 @@ class Enemy(pygame.sprite.Sprite):
   def destroy(self):
     self.exploding = True
 
+    # TODO: Refactor things to remove this coupling
+    self.game.scoreboard.score += 250
+
   def update(self):
     if self.exploding:
       self.image = self.explosions[self.explode_index]

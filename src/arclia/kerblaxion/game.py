@@ -12,6 +12,7 @@ from pygame.locals import *
 from arclia.pubsub import Publisher
 
 from .assets import MUSIC_PATH
+from .ui.score import Scoreboard
 
 LOGGER = logging.getLogger(__name__)
 
@@ -70,6 +71,8 @@ class GameManager(object):
 
     self.execution_state = ExecutionState.STOPPED
 
+    self.scoreboard = Scoreboard()
+
   def request_shutdown(self):
     if self.execution_state == ExecutionState.RUNNING:
       self.execution_state = ExecutionState.STOPPING
@@ -96,6 +99,13 @@ class GameManager(object):
 
       self._render_surface.fill(color = (0, 0, 0))
       self.visible_sprites.draw(self._render_surface)
+
+      self._render_surface.blit(
+        self.scoreboard.image,
+        dest = self.scoreboard.image.get_rect(
+          topright = (320, 0),
+        )
+      )
 
       pygame.transform.scale(
         surface = self._render_surface,
