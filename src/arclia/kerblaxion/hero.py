@@ -2,7 +2,51 @@
 import pygame
 from pygame.locals import *
 
+from arclia.happygame.math import Vector2Coercible
+
 from .assets import get_surface, get_sound
+from .game import Game
+
+class Enemy(pygame.sprite.Sprite):
+  def __init__(self,
+    position: Vector2Coercible,
+    game: "Game",
+  ):
+    super().__init__()
+    self.game = game
+
+    self.image = get_surface("enemy01.png")
+
+    self.rect = self.image.get_rect(
+      center = position,
+    )
+
+    self.direction = +1
+
+    self.exploding = False
+    self.explode_index = 0
+
+    self.explosions = [
+      get_surface(f"explode0{i+1}.png")
+      for i in range(4)
+    ]
+
+  def destroy(self):
+    self.exploding = True
+
+  def update(self):
+    if self.exploding:
+      self.image = self.explosions[self.explode_index]
+      self.explode_index += 1
+      if self.explode_index >= 4:
+        self.kill()
+    else:
+      self.rect.x += self.direction
+
+      if self.rect.right >= 320 or self.rect.left <= 0:
+        self.direction = -self.direction
+        self.rect.y += 8
+
 
 class Bullet(pygame.sprite.Sprite):
   def __init__(self, position, game):
@@ -91,3 +135,25 @@ class Hero(pygame.sprite.Sprite):
     else:
       self.shooting = False
 
+
+def prepare(game: Game):
+  game.visible_sprites.add(Hero(
+    position = (180, 160),
+    game = game,
+  ))
+
+  for x in range(16, 260, 24):
+    for y in range(16, 100, 24):
+      e = Enemy(
+        position = (x, y),
+        game = game,
+      )
+      game.visible_sprites.add(e)
+      game.enemies.add(e)
+
+
+  def handle_quit(event: pygame.event.Event):
+    if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
+      game.quit()
+
+  game.event_received.add(handle_quit)
