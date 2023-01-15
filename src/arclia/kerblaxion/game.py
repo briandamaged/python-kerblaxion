@@ -99,7 +99,11 @@ class Game(object):
     self.score = 0
     self.font = self.font = pygame.font.Font(FONTS_PATH / "Silkscreen-Regular.ttf", 8)
 
+    self.life_surface = get_surface("hero", "life.png")
 
+  @property
+  def lives(self):
+    return (self.score // 5) + 1
 
   def run(self):
     pygame.mixer.music.load(MUSIC_PATH.joinpath("level01.mp3").open())
@@ -134,6 +138,14 @@ class Game(object):
         source = score_surface,
         dest = score_rect,
       )
+
+      for life_no in range(self.lives):
+        self.render_surface.blit(
+          source = self.life_surface,
+          dest = self.life_surface.get_rect(
+            bottomright = (320, 180 - (life_no * 10))
+          )
+        )
 
       pygame.transform.scale(
         surface = self.render_surface,
