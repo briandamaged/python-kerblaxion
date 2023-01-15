@@ -86,8 +86,6 @@ class Bullet(pygame.sprite.Sprite):
       center = position,
     )
 
-    self.explode_sfx = get_sound("hero-explode.wav")
-
   def update(self, ctx: UpdateContext):
     self.rect.y -= 4
 
@@ -100,7 +98,6 @@ class Bullet(pygame.sprite.Sprite):
     if len(collisions) > 0:
       for c in collisions:
         c.destroy()
-      self.explode_sfx.play()
       self.kill()
       return
 
@@ -186,10 +183,13 @@ class GameScene(Scene):
 def prepare():
   scene = GameScene()
 
+  explode_sfx = get_sound("hero-explode.wav")
+
   def handle_enemy_destroyed(enemy: Enemy):
     scene.scoreboard.score += 250
     explosion = Explosion(position = enemy.position)
     scene.visible_sprites.add(explosion)
+    explode_sfx.play()
 
   scene.visible_sprites.add(Hero(
     position = (180, 160),
