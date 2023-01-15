@@ -3,17 +3,17 @@ import pygame
 from pygame.locals import *
 
 from arclia.happygame.math import Vector2Coercible
+from arclia.pubsub import Publisher
 
 from .assets import get_surface, get_sound
-from .game import GameManager
+from .ui.score import Scoreboard
+from .game import GameManager, Scene, UpdateContext
 
 class Enemy(pygame.sprite.Sprite):
   def __init__(self,
     position: Vector2Coercible,
-    game: "GameManager",
   ):
     super().__init__()
-    self.game = game
 
     self.image = get_surface("enemy01.png")
 
@@ -31,11 +31,11 @@ class Enemy(pygame.sprite.Sprite):
       for i in range(4)
     ]
 
+    self.on_destroyed = Publisher[Enemy]()
+
   def destroy(self):
     self.exploding = True
-
-    # TODO: Refactor things to remove this coupling
-    self.game.scoreboard.score += 250
+    self.on_destroyed(self)
 
   def update(self):
     if self.exploding:
@@ -139,31 +139,49 @@ class Hero(pygame.sprite.Sprite):
       self.shooting = False
 
 
-def prepare(game: GameManager):
-  game.visible_sprites.add(Hero(
+class GameScene(Scene):
+  def __init__(self):
+    self.visible_sprites = pygame.sprite.Group()
+    self.player_bullets = pygame.sprite.Group()
+    self.enemies = pygame.sprite.Group()
+
+    self.scoreboard = Scoreboard()
+
+  def update(self, ctx: UpdateContext):
+    self.visible_sprites.update()
+
+  def draw(self, surface: pygame.surface.Surface):
+    surface.fill(color = (0, 0, 0))
+    self.visible_sprites.draw(surface)
+
+    surface.blit(
+      self.scoreboard.image,
+      dest = self.scoreboard.image.get_rect(
+        topright = (320, 0),
+      )
+    )
+
+
+def prepare():
+  scene = GameScene()
+
+  def handle_enemy_destroyed(enemy: Enemy):
+    scene.scoreboard.score += 250
+
+  scene.visible_sprites.add(Hero(
     position = (180, 160),
-    game = game,
+    game = scene,
   ))
 
   for x in range(16, 260, 24):
     for y in range(16, 100, 24):
       e = Enemy(
         position = (x, y),
-        game = game,
-      )
-      game.visible_sprites.add(e)
-      game.enemies.add(e)
-
-
-  def handle_quit(event: pygame.event.Event):
-    if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
-      game.request_shutdown()
-
-  def handle_resize(event: pygame.event.Event):
-    if event.type == KEYDOWN and event.key == K_r:
-      game._display_surface = pygame.display.set_mode(
-        size = (640, 360),
       )
 
-  game.event_received.add(handle_quit)
-  game.event_received.add(handle_resize)
+      e.on_destroyed.add(handle_enemy_destroyed)
+
+      scene.visible_sprites.add(e)
+      scene.enemies.add(e)
+
+  return scene

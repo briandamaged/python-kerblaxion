@@ -29,9 +29,19 @@ def pygame_session():
 
 
 @dataclass(frozen = True)
-class Instant:
+class UpdateContext:
   t: int
   dt: int
+
+
+class Scene(object):
+  def update(self, ctx: UpdateContext):
+    pass
+
+  def draw(self, surface: pygame.surface.Surface):
+    surface.fill(
+      color = (0, 0, 0),
+    )
 
 
 
@@ -47,6 +57,8 @@ class GameManager(object):
     scale: int = 4,
     fps: int = 30,
   ):
+    self.event_received = Publisher[pygame.event.Event]()
+
     self._render_surface = pygame.surface.Surface(
       size = (320, 180),
     )
@@ -63,15 +75,8 @@ class GameManager(object):
     self.clock = pygame.time.Clock()
     self.fps = fps
 
-    self.visible_sprites = pygame.sprite.Group()
-    self.player_bullets = pygame.sprite.Group()
-    self.enemies = pygame.sprite.Group()
-
-    self.event_received = Publisher[pygame.event.Event]()
-
+    self.scene = Scene()
     self.execution_state = ExecutionState.STOPPED
-
-    self.scoreboard = Scoreboard()
 
   def request_shutdown(self):
     if self.execution_state == ExecutionState.RUNNING:
@@ -90,22 +95,22 @@ class GameManager(object):
     pygame.mixer.music.load(MUSIC_PATH.joinpath("level01.mp3").open())
     pygame.mixer.music.play(-1)
 
+    previous_update_at = pygame.time.get_ticks()
+
     self.execution_state = ExecutionState.RUNNING
     while self.execution_state == ExecutionState.RUNNING:
       for event in pygame.event.get():
         self.event_received(event)
 
-      self.visible_sprites.update()
-
-      self._render_surface.fill(color = (0, 0, 0))
-      self.visible_sprites.draw(self._render_surface)
-
-      self._render_surface.blit(
-        self.scoreboard.image,
-        dest = self.scoreboard.image.get_rect(
-          topright = (320, 0),
-        )
+      update_at = pygame.time.get_ticks()
+      update_context = UpdateContext(
+        t = update_at,
+        dt = (update_at - previous_update_at),
       )
+      previous_update_at = update_at
+      self.scene.update(update_context)
+
+      self.scene.draw(self._render_surface)
 
       pygame.transform.scale(
         surface = self._render_surface,

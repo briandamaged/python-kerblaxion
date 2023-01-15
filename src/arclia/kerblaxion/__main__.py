@@ -1,6 +1,9 @@
 
 import argparse
 
+import pygame
+from pygame.locals import *
+
 from .game import GameManager, pygame_session
 from .hero import prepare
 
@@ -34,5 +37,12 @@ def main():
       fps = args.fps,
     )
 
-    prepare(game)
+    def handle_quit(event: pygame.event.Event):
+      if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
+        game.request_shutdown()
+
+    game.event_received.add(handle_quit)
+
+    game.scene = prepare()
+
     game.run()
