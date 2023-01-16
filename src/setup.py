@@ -14,7 +14,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
   name="kerblaxion",
-  version="0.1.0",
+  version="0.2.0",
   description="Space Invaders + Galaxian Clone",
   long_description=long_description,
   long_description_content_type="text/markdown",
