@@ -1,4 +1,5 @@
 
+import random
 import pygame
 from pygame.locals import *
 
@@ -8,6 +9,31 @@ from arclia.pubsub import Publisher
 from .assets import get_surface, get_sound
 from .ui.score import Scoreboard
 from .game import GameManager, Scene, UpdateContext
+
+class Star(pygame.sprite.Sprite):
+  def __init__(self, position: Vector2Coercible):
+    super().__init__()
+    self.position = pygame.Vector2(position)
+    size = random.randint(1, 2)
+
+    self.image = pygame.surface.Surface(
+      size = (size, size),
+    )
+
+    c = (random.random() * 32) + 1
+    self.image.fill(
+      color = (c, c, c),
+    )
+
+  @property
+  def rect(self):
+    return self.image.get_rect(center = self.position)
+
+  def update(self, ctx: UpdateContext):
+    self.position.y += 1
+    if self.rect.top > 180:
+      self.kill()
+
 
 class Explosion(pygame.sprite.Sprite):
   def __init__(self,
@@ -160,17 +186,32 @@ class Hero(pygame.sprite.Sprite):
 
 class GameScene(Scene):
   def __init__(self):
+    self.background_sprites = pygame.sprite.Group()
     self.visible_sprites = pygame.sprite.Group()
     self.player_bullets = pygame.sprite.Group()
     self.enemies = pygame.sprite.Group()
 
     self.scoreboard = Scoreboard()
 
+    for y in range(0, 180):
+      self._generate_stars(y)
+
+  def _generate_stars(self, y: float = 0.0):
+    for _ in range(random.randint(0, 2)):
+      star = Star(
+        position = (random.random() * 320, y),
+      )
+
+      self.background_sprites.add(star)
+
   def update(self, ctx: UpdateContext):
+    self._generate_stars()
+    self.background_sprites.update(ctx)
     self.visible_sprites.update(ctx)
 
   def draw(self, surface: pygame.surface.Surface):
     surface.fill(color = (0, 0, 0))
+    self.background_sprites.draw(surface)
     self.visible_sprites.draw(surface)
 
     surface.blit(
