@@ -53,7 +53,7 @@ class Enemy(pygame.sprite.Sprite):
 
     self.direction = +1
 
-    self.on_destroyed = Publisher[Enemy]()
+    [self.on_destroyed, self._emit_destroyed] = Publisher[Enemy].methods()
 
   @property
   def rect(self):
@@ -62,15 +62,16 @@ class Enemy(pygame.sprite.Sprite):
     )
 
   def destroy(self):
-    self.on_destroyed(self)
+    self._emit_destroyed(self)
     self.kill()
 
   def update(self, ctx: UpdateContext):
-    self.position.x += self.direction
+    self.position.x += (self.direction)
 
     r = self.rect
     if r.right >= 320 or r.left <= 0:
       self.direction = -self.direction
+      self.position.x += (self.direction)
       self.position.y += 8
 
 
@@ -202,7 +203,7 @@ def prepare():
         position = (x, y),
       )
 
-      e.on_destroyed.add(handle_enemy_destroyed)
+      e.on_destroyed(handle_enemy_destroyed)
 
       scene.visible_sprites.add(e)
       scene.enemies.add(e)

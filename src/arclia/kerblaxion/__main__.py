@@ -41,7 +41,7 @@ def main():
       if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
         game.request_shutdown()
 
-    game.event_received.add(handle_quit)
+    game.on_event(handle_quit)
 
     game.scene = prepare()
 

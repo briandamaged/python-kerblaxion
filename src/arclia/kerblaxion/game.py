@@ -4,8 +4,6 @@ import logging
 from enum import Enum
 from contextlib import contextmanager
 
-from dataclasses import dataclass
-
 import pygame
 from pygame.locals import *
 
@@ -27,12 +25,11 @@ def pygame_session():
   pygame.quit()
 
 
-
-@dataclass(frozen = True)
 class UpdateContext:
-  t: int
-  dt: int
-
+  def __init__(self, t: int, dt: int):
+    self.t = t
+    self.dt = dt
+    # self.scale = (self.dt / 40)
 
 class Scene(object):
   def update(self, ctx: UpdateContext):
@@ -57,7 +54,7 @@ class GameManager(object):
     scale: int = 4,
     fps: int = 30,
   ):
-    self.event_received = Publisher[pygame.event.Event]()
+    [self.on_event, self._emit_event] = Publisher[pygame.event.Event].methods()
 
     self._render_surface = pygame.surface.Surface(
       size = (320, 180),
@@ -100,7 +97,7 @@ class GameManager(object):
     self.execution_state = ExecutionState.RUNNING
     while self.execution_state == ExecutionState.RUNNING:
       for event in pygame.event.get():
-        self.event_received(event)
+        self._emit_event(event)
 
       update_at = pygame.time.get_ticks()
       update_context = UpdateContext(
