@@ -23,9 +23,7 @@ setuptools.setup(
   ),
   package_data = {
     'arclia.kerblaxion.assets': [
-      *find_assets("**/*.png"),
-      *find_assets("**/*.wav"),
-      *find_assets("**/*.mp3"),
+      *find_assets("**/*"),
     ],
   },
   classifiers=[
