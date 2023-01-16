@@ -14,13 +14,15 @@ class Star(pygame.sprite.Sprite):
   def __init__(self, position: Vector2Coercible):
     super().__init__()
     self.position = pygame.Vector2(position)
-    size = random.randint(1, 2)
 
+    size = random.randint(1, 2)
     self.image = pygame.surface.Surface(
       size = (size, size),
     )
 
-    c = (random.random() * 32) + 1
+    distance = random.random()
+    self.speed = 0.5 + distance
+    c = (distance * 32) + 1
     self.image.fill(
       color = (c, c, c),
     )
@@ -30,7 +32,7 @@ class Star(pygame.sprite.Sprite):
     return self.image.get_rect(center = self.position)
 
   def update(self, ctx: UpdateContext):
-    self.position.y += 1
+    self.position.y += self.speed
     if self.rect.top > 180:
       self.kill()
 
