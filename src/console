@@ -24,4 +24,5 @@ docker run \
   --device "$KERBLAXION_SOUND" \
   --mount "type=bind,source=$(pwd),target=/usr/src/app" \
   --mount "type=bind,source=${KERBLAXION_X11},target=/tmp/.X11-unix/" \
+  "$@" \
   "$KERBLAXION_IMAGE" bash
