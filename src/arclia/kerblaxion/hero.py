@@ -11,7 +11,7 @@ from .ui.score import Scoreboard
 from .game import Scene
 
 from .entities.core import UpdateContext
-from .entities.bullet import Bullet
+from .entities.hero import Hero
 
 class Star(pygame.sprite.Sprite):
   def __init__(self, position: Vector2Coercible):
@@ -105,59 +105,6 @@ class Enemy(pygame.sprite.Sprite):
       self.position.x += (self.direction)
       self.position.y += 8
 
-
-class Hero(pygame.sprite.Sprite):
-  def __init__(self, position, game):
-    super().__init__()
-    self.game = game
-
-    self.images = [
-      get_surface(f"hero/hero0{i + 1}.png")
-      for i in range(4)
-    ]
-
-    self.image_index = 0
-
-    self.rect = self.image.get_rect(
-      center = position,
-    )
-
-    self.shoot_sfx = get_sound("shoot.wav")
-
-    self.shooting = False
-
-  @property
-  def image(self):
-    return self.images[self.image_index]
-
-  def update(self, ctx: UpdateContext):
-    self.image_index = (ctx.t_ms >> 5) % 4
-
-    pressed = pygame.key.get_pressed()
-    boosted = pressed[K_LSHIFT]
-
-    v = 25 * (3 if boosted else 2) * ctx.dt
-
-    if pressed[K_LEFT]:
-      self.rect.x -= v
-
-    if pressed[K_RIGHT]:
-      self.rect.x += v
-
-    if pressed[K_SPACE]:
-      if not self.shooting:
-        self.game.visible_sprites.add(
-          Bullet(
-            position = self.rect.center,
-            velocity = (0, -75),
-          )
-        )
-        self.shoot_sfx.play()
-        self.shooting = True
-    else:
-      self.shooting = False
-
-
 class GameScene(Scene):
   def __init__(self):
     self.background_sprites = pygame.sprite.Group()
@@ -209,7 +156,6 @@ def prepare():
 
   scene.visible_sprites.add(Hero(
     position = (180, 160),
-    game = scene,
   ))
 
   for x in range(16, 260, 24):
