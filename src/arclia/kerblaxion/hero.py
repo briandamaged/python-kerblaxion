@@ -8,7 +8,10 @@ from arclia.pubsub import Publisher
 
 from .assets import get_surface, get_sound
 from .ui.score import Scoreboard
-from .game import GameManager, Scene, UpdateContext
+from .game import Scene
+
+from .entities.core import UpdateContext
+from .entities.bullet import Bullet
 
 class Star(pygame.sprite.Sprite):
   def __init__(self, position: Vector2Coercible):
@@ -64,7 +67,7 @@ class Explosion(pygame.sprite.Sprite):
 
   def update(self, ctx: UpdateContext):
     # Update the explosion animation every 32 milliseconds
-    self.explode_index = (ctx.t - self.started_at) >> 5
+    self.explode_index = (ctx.t_ms - self.started_at) >> 5
 
     if self.explode_index >= len(self.explosions):
       self.kill()
@@ -103,37 +106,6 @@ class Enemy(pygame.sprite.Sprite):
       self.position.y += 8
 
 
-class Bullet(pygame.sprite.Sprite):
-  def __init__(self, position, game):
-    super().__init__()
-    self.game = game
-
-    self.image = pygame.surface.Surface(size = (4, 4))
-    self.image.fill(color = (255, 255, 0))
-
-    self.rect = self.image.get_rect(
-      center = position,
-    )
-
-  def update(self, ctx: UpdateContext):
-    self.rect.y -= 4
-
-    collisions = pygame.sprite.spritecollide(
-      sprite = self,
-      group = self.game.enemies,
-      dokill = False,
-    )
-
-    if len(collisions) > 0:
-      for c in collisions:
-        c.destroy()
-      self.kill()
-      return
-
-    if self.rect.bottom < 0:
-      self.kill()
-
-
 class Hero(pygame.sprite.Sprite):
   def __init__(self, position, game):
     super().__init__()
@@ -159,12 +131,12 @@ class Hero(pygame.sprite.Sprite):
     return self.images[self.image_index]
 
   def update(self, ctx: UpdateContext):
-    self.image_index = (ctx.t >> 5) % 4
+    self.image_index = (ctx.t_ms >> 5) % 4
 
     pressed = pygame.key.get_pressed()
     boosted = pressed[K_LSHIFT]
 
-    v = 2 * (2 if boosted else 1)
+    v = 25 * (3 if boosted else 2) * ctx.dt
 
     if pressed[K_LEFT]:
       self.rect.x -= v
@@ -177,7 +149,7 @@ class Hero(pygame.sprite.Sprite):
         self.game.visible_sprites.add(
           Bullet(
             position = self.rect.center,
-            game = self.game,
+            velocity = (0, -75),
           )
         )
         self.shoot_sfx.play()

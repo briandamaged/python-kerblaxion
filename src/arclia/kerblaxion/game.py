@@ -12,6 +12,8 @@ from arclia.pubsub import Publisher
 from .assets import MUSIC_PATH
 from .ui.score import Scoreboard
 
+from .entities.core import UpdateContext
+
 LOGGER = logging.getLogger(__name__)
 
 @contextmanager
@@ -23,13 +25,6 @@ def pygame_session():
   yield
 
   pygame.quit()
-
-
-class UpdateContext:
-  def __init__(self, t: int, dt: int):
-    self.t = t
-    self.dt = dt
-    # self.scale = (self.dt / 40)
 
 class Scene(object):
   def update(self, ctx: UpdateContext):
@@ -101,8 +96,11 @@ class GameManager(object):
 
       update_at = pygame.time.get_ticks()
       update_context = UpdateContext(
-        t = update_at,
-        dt = (update_at - previous_update_at),
+        t_ms = update_at,
+        dt_ms = (update_at - previous_update_at),
+
+        # FIXME: Figure out a better way to provide this
+        game = self.scene,
       )
       previous_update_at = update_at
       self.scene.update(update_context)
