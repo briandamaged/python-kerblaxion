@@ -67,7 +67,7 @@ class Enemy(pygame.sprite.Sprite):
     self.kill()
 
   def update(self, ctx: UpdateContext):
-    self.position.x += (self.direction)
+    self.position.x += (self.direction) * 30 * ctx.dt
 
     r = self.rect
     if r.right >= 320 or r.left <= 0:

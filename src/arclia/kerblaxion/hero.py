@@ -3,10 +3,8 @@ import random
 import pygame
 from pygame.locals import *
 
-from arclia.happygame.math import Vector2Coercible
-from arclia.pubsub import Publisher
 
-from .assets import get_surface, get_sound
+from .assets import get_sound
 from .ui.score import Scoreboard
 from .game import Scene
 
