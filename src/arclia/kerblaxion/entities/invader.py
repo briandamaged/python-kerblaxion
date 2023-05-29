@@ -1,5 +1,6 @@
 
 import pygame
+from pygame import Vector2
 
 from arclia.pubsub import Publisher
 from arclia.happygame.math import Vector2Coercible
@@ -14,7 +15,7 @@ class Explosion(pygame.sprite.Sprite):
     position: Vector2Coercible,
   ):
     super().__init__()
-    self.position = pygame.Vector2(position)
+    self.position = Vector2(position)
 
     self.explode_index = 0
     self.explosions = [
@@ -48,7 +49,7 @@ class Enemy(pygame.sprite.Sprite):
     position: Vector2Coercible,
   ):
     super().__init__()
-    self.position = pygame.Vector2(position)
+    self.position = Vector2(position)
 
     self.image = get_surface("enemy01.png")
 
