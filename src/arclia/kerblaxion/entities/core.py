@@ -1,4 +1,6 @@
 
+from arclia.happygame.math import Vector2, Vector2Coercible
+
 class UpdateContext:
   def __init__(
     self,
@@ -13,3 +15,6 @@ class UpdateContext:
     self.dt = dt_ms / 1000
 
     self.game = game
+
+  def scale(self, v: Vector2Coercible):
+    return self.dt * Vector2(v)
