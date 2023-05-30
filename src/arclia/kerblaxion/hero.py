@@ -8,7 +8,8 @@ from .assets import get_sound
 from .ui.score import Scoreboard
 from .game import Scene
 
-from .entities.core import UpdateContext
+from .engine import UpdateContext
+from .entities.bullet import BulletFactory
 from .entities.invader import Enemy, Explosion
 from .entities.hero import Hero
 from .entities.star import Star
@@ -69,6 +70,10 @@ def prepare():
 
   scene.visible_sprites.add(Hero(
     position = (180, 160),
+    bullet_factory = BulletFactory(
+      visible_sprites = scene.visible_sprites,
+      enemies = scene.enemies,
+    ),
   ))
 
   for x in range(16, 260, 24):

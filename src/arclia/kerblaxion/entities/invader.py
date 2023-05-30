@@ -7,7 +7,7 @@ from arclia.happygame.math import Vector2Coercible
 
 from ..assets import get_sound, get_surface
 
-from .core import UpdateContext
+from ..engine import UpdateContext
 
 
 class Explosion(pygame.sprite.Sprite):
@@ -38,7 +38,7 @@ class Explosion(pygame.sprite.Sprite):
 
   def update(self, ctx: UpdateContext):
     # Update the explosion animation every 32 milliseconds
-    self.explode_index = (ctx.t_ms - self.started_at) >> 5
+    self.explode_index = (ctx.now.t_ms - self.started_at) >> 5
 
     if self.explode_index >= len(self.explosions):
       self.kill()
@@ -68,7 +68,7 @@ class Enemy(pygame.sprite.Sprite):
     self.kill()
 
   def update(self, ctx: UpdateContext):
-    self.position.x += (self.direction) * 30 * ctx.dt
+    self.position.x += (self.direction) * 30 * ctx.now.dt
 
     r = self.rect
     if r.right >= 320 or r.left <= 0:

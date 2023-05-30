@@ -12,7 +12,8 @@ from arclia.pubsub import Publisher
 from .assets import MUSIC_PATH
 from .ui.score import Scoreboard
 
-from .entities.core import UpdateContext
+from .engine import UpdateContext
+from .moment import Ticker
 
 LOGGER = logging.getLogger(__name__)
 
@@ -70,6 +71,8 @@ class GameManager(object):
     self.scene = Scene()
     self.execution_state = ExecutionState.STOPPED
 
+    self._ticker = Ticker()
+
   def request_shutdown(self):
     if self.execution_state == ExecutionState.RUNNING:
       self.execution_state = ExecutionState.STOPPING
@@ -94,15 +97,11 @@ class GameManager(object):
       for event in pygame.event.get():
         self._emit_event(event)
 
-      update_at = pygame.time.get_ticks()
-      update_context = UpdateContext(
-        t_ms = update_at,
-        dt_ms = (update_at - previous_update_at),
 
-        # FIXME: Figure out a better way to provide this
-        game = self.scene,
+      update_context = UpdateContext(
+        now = self._ticker.tick(),
       )
-      previous_update_at = update_at
+
       self.scene.update(update_context)
 
       self.scene.draw(self._render_surface)

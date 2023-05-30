@@ -4,11 +4,11 @@ from pygame.locals import *
 
 from ..assets import get_surface, get_sound
 
-from .core import UpdateContext
-from .bullet import Bullet
+from ..engine import UpdateContext
+from .bullet import Bullet, BulletFactory
 
 class Hero(pygame.sprite.Sprite):
-  def __init__(self, position):
+  def __init__(self, position, bullet_factory: BulletFactory):
     super().__init__()
 
     self.images = [
@@ -26,17 +26,19 @@ class Hero(pygame.sprite.Sprite):
 
     self.shooting = False
 
+    self.bullet_factory = bullet_factory
+
   @property
   def image(self):
     return self.images[self.image_index]
 
   def update(self, ctx: UpdateContext):
-    self.image_index = (ctx.t_ms >> 5) % 4
+    self.image_index = (ctx.now.t_ms >> 5) % 4
 
     pressed = pygame.key.get_pressed()
     boosted = pressed[K_LSHIFT]
 
-    v = 25 * (3 if boosted else 2) * ctx.dt
+    v = 25 * (3 if boosted else 2) * ctx.now.dt
 
     if pressed[K_LEFT]:
       self.rect.x -= v
@@ -46,12 +48,11 @@ class Hero(pygame.sprite.Sprite):
 
     if pressed[K_SPACE]:
       if not self.shooting:
-        ctx.game.visible_sprites.add(
-          Bullet(
-            position = self.rect.center,
-            velocity = (0, -75),
-          )
+        self.bullet_factory.create(
+          position = self.rect.center,
+          velocity = (0, -75),
         )
+
         self.shoot_sfx.play()
         self.shooting = True
     else:

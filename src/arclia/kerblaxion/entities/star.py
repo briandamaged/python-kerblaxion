@@ -5,7 +5,7 @@ import pygame
 
 from arclia.happygame.math import Vector2Coercible
 
-from .core import UpdateContext
+from ..engine import UpdateContext
 
 
 class Star(pygame.sprite.Sprite):
