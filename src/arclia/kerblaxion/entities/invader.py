@@ -1,6 +1,9 @@
 
+from dataclasses import dataclass
+
 import pygame
 from pygame import Vector2
+from pygame.sprite import Group
 
 from arclia.pubsub import Publisher
 from arclia.happygame.math import Vector2Coercible
@@ -24,6 +27,8 @@ class Explosion(pygame.sprite.Sprite):
     ]
 
     self.started_at = pygame.time.get_ticks()
+
+    get_sound("hero-explode.wav").play()
 
 
   @property
@@ -75,3 +80,23 @@ class Enemy(pygame.sprite.Sprite):
       self.direction = -self.direction
       self.position.x += (self.direction)
       self.position.y += 8
+
+
+
+
+
+@dataclass
+class EnemyFactory:
+  visible_sprites: Group
+  enemies: Group
+
+  def _handle_enemy_destroyed(self, enemy: Enemy):
+    explosion = Explosion(position = enemy.position)
+    self.visible_sprites.add(explosion)
+
+  def create(self, *args, **kwargs):
+    e = Enemy(*args, **kwargs)
+    self.visible_sprites.add(e)
+    self.enemies.add(e)
+    e.on_destroyed(self._handle_enemy_destroyed)
+    return e
